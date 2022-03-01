@@ -10,7 +10,8 @@ class PosOrder(models.Model):
     serie_fel = fields.Char('Serie FEL', related='account_move.serie_fel')
     numero_fel = fields.Char('Numero FEL', related='account_move.numero_fel')
     certificador_fel = fields.Char('Certificador FEL', related='account_move.certificador_fel')
-    
+    factura_original_id = fields.Integer('Factura Original', related='account_move.factura_original_id.id')
+
     def _prepare_invoice_line(self, order_line):
         res = super(PosOrder, self)._prepare_invoice_line(order_line)
         if order_line.pack_lot_ids:

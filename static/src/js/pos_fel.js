@@ -1,6 +1,6 @@
 odoo.define('pos_fel.pos_fel', function (require) {
     "use strict";
-    
+
     const OrderReceipt = require('point_of_sale.OrderReceipt');
     const PosComponent = require('point_of_sale.PosComponent');
     var field_utils = require('web.field_utils');
@@ -8,31 +8,31 @@ odoo.define('pos_fel.pos_fel', function (require) {
     const Registries = require('point_of_sale.Registries');
 
     const { useState } = owl.hooks;
-    
+
     const PosFELOrderReceipt = (OrderReceipt) =>
         class extends OrderReceipt {
             constructor() {
                 super(...arguments);
-                this.state = useState({ fel_gt: { firma_fel: '', serie_fel: '', numero_fel: '', certificador_fel: '', fecha_pedido: '' } });
+                this.state = useState({ fel_gt: { firma_fel: '', serie_fel: '', numero_fel: '', certificador_fel: '', fecha_pedido: '', is_refund: false } });
                 const state = this.state;
                 const timezone = this.env.session.user_context.tz;
-                
+
                 this.rpc({
                     model: 'pos.order',
                     method: 'search_read',
-                    args: [[['pos_reference', '=', this.props.order.name]], ["firma_fel", "serie_fel", "numero_fel", "certificador_fel", "date_order"]],
+                    args: [[['pos_reference', '=', this.props.order.name]], ["firma_fel", "serie_fel", "numero_fel", "certificador_fel", "date_order", "factura_original_id"]],
                 }, {
                     timeout: 5000,
                 }).then(function (orders) {
                     console.log(orders);
                     if (orders.length > 0) {
-                        
+
                         state.fel_gt.firma_fel = orders[0].firma_fel;
                         state.fel_gt.serie_fel = orders[0].serie_fel;
                         state.fel_gt.numero_fel = orders[0].numero_fel;
                         state.fel_gt.certificador_fel = orders[0].certificador_fel;
-                        state.fel_gt.fecha_pedido = field_utils.format.datetime(moment(orders[0].date_order), {}, {timezone: timezone});;
-                        
+                        state.fel_gt.fecha_pedido = field_utils.format.datetime(moment(orders[0].date_order), {}, { timezone: timezone });
+                        state.fel_gt.is_refund = orders[0].factura_original_id != 0
                         /*
                         var env = self.get_receipt_render_env();
                         var precio_total_descuento = 0;
@@ -65,7 +65,7 @@ odoo.define('pos_fel.pos_fel', function (require) {
                 });
             }
         };
-        
+
     Registries.Component.extend(OrderReceipt, PosFELOrderReceipt);
 
 });
