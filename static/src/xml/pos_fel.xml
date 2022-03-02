@@ -27,7 +27,7 @@
                 <t t-if="state.fel_gt.is_refund">
                     Nota de crédito Electrónica<br/>
                 </t>
-                <t t-if="state.fel_gt.is_refund == False">
+                <t t-else="">
                     Factura Electrónica<br/>
                 </t>
                     Serie: <t t-esc="state.fel_gt.serie_fel || ''"/><br/>
